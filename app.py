@@ -4,43 +4,48 @@ import io
 import time
 import os
 
-# --- ESTILIZAÇÃO CSS
+# --- CONFIGURAÇÃO DA PÁGINA ---
+st.set_page_config(
+    page_title="GabaritaAI // System",
+    page_icon="💾",
+    layout="centered",
+    initial_sidebar_state="expanded"
+)
+
+# --- ESTILIZAÇÃO CSS (Visual Geek Corrigido) ---
 st.markdown("""
 <style>
-    /* Importando fonte estilo 'Console' */
     @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
 
-    /* Fundo Geral e Texto */
-    /* Aplicamos a fonte no corpo principal, deixando os ícones (que usam outras classes) em paz */
+    /* Fundo e Fonte Base */
     .stApp {
         background-color: #0e1117;
         font-family: 'Fira Code', monospace;
         color: #e0e0e0;
     }
     
-    /* Forçamos a fonte apenas em Títulos e Parágrafos, não em ícones (spans/divs genéricos) */
-    h1, h2, h3, p {
+    /* Força fonte apenas em textos principais para não quebrar ícones */
+    h1, h2, h3, p, label, .stButton, .stTextInput {
         font-family: 'Fira Code', monospace !important;
-        color: #e0e0e0;
     }
 
-    /* Título Principal com efeito Neon */
+    /* Título Neon */
     .title-glitch {
         font-size: 40px;
         font-weight: bold;
-        color: #00ff41; /* Verde Matrix */
+        color: #00ff41;
         text-shadow: 0 0 10px #00ff41;
         margin-bottom: 20px;
     }
 
-    /* Estilização do Botão de Upload */
+    /* Upload Area */
     .stFileUploader {
         border: 1px dashed #00ff41;
         padding: 10px;
         border-radius: 5px;
     }
 
-    /* Botões Principais */
+    /* Botões */
     .stButton>button {
         width: 100%;
         background-color: transparent;
@@ -49,7 +54,6 @@ st.markdown("""
         border-radius: 0px;
         font-weight: bold;
         transition: all 0.3s ease;
-        font-family: 'Fira Code', monospace !important; /* Força fonte no botão */
     }
     
     .stButton>button:hover {
@@ -64,28 +68,28 @@ st.markdown("""
         background-color: #00ff41;
     }
     
-    /* Caixas de Sucesso/Erro */
+    /* Mensagens */
     .stSuccess {
         background-color: rgba(0, 255, 65, 0.1);
         border-left: 5px solid #00ff41;
         color: #00ff41;
     }
     
-    /* Garante que os inputs de texto também fiquem geek */
-    .stTextInput > div > div > input {
-        font-family: 'Fira Code', monospace !important;
-        color: #00ff41 !important;
+    .stWarning {
+        background-color: rgba(255, 215, 0, 0.1);
+        border-left: 5px solid #FFD700;
+        color: #FFD700;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- BARRA LATERAL (SIDEBAR) ---
+# --- BARRA LATERAL ---
 with st.sidebar:
     st.markdown("### 🖥️ SYSTEM STATUS")
     st.markdown("---")
     st.markdown("**CORE:** `ONLINE`")
     st.markdown("**MODULE:** `PYMUPDF`")
-    st.markdown("**VERSION:** `v1.0.5-stable`")
+    st.markdown("**VERSION:** `v1.0.6-stable`")
     st.markdown("---")
     st.info("💡 **DICA:** O algoritmo reescreve todas as alternativas para garantir anonimato total da resposta correta.")
     st.markdown("---")
@@ -96,7 +100,7 @@ st.markdown('<div class="title-glitch">> GabaritaAI_ </div>', unsafe_allow_html=
 st.markdown("`Inicializando protocolo de limpeza de provas...`")
 st.markdown("---")
 
-# --- FUNÇÕES DE LIMPEZA ---
+# --- LÓGICA DE LIMPEZA ---
 def desenhar_quadrado(page, rect_original, tamanho=9.0):
     page.add_redact_annot(rect_original, fill=(1, 1, 1))
     page.apply_redactions()
@@ -109,7 +113,6 @@ def desenhar_quadrado(page, rect_original, tamanho=9.0):
     shape.commit()
 
 def desenhar_novo_parenteses(page, rect_original):
-    # Padding de segurança
     rect_apagar = fitz.Rect(rect_original.x0 - 1, rect_original.y0 - 1, rect_original.x1 + 1, rect_original.y1 + 1)
     page.add_redact_annot(rect_apagar, fill=(1, 1, 1))
     page.apply_redactions()
@@ -162,7 +165,6 @@ def processar_pdf(input_stream, status_terminal):
     return output_buffer, total_alterados
 
 # --- INTERFACE PRINCIPAL ---
-
 uploaded_file = st.file_uploader("📂 CARREGAR ARQUIVO ALVO (.PDF)", type="pdf")
 
 if uploaded_file is not None:
@@ -184,10 +186,9 @@ if uploaded_file is not None:
             
             if qtd > 0:
                 st.success(f"✔️ SUCESSO! {qtd} ALTERNATIVAS PADRONIZADAS.")
-                st.balloons()
+                # st.balloons() <- REMOVIDO PARA VISUAL MAIS SÉRIO
                 
-                # --- LÓGICA DO NOME DO ARQUIVO ---
-                # Remove a extensão .pdf e adiciona _limpa.pdf
+                # Nome do arquivo ajustado
                 nome_original = os.path.splitext(uploaded_file.name)[0]
                 nome_novo = f"{nome_original}_limpa.pdf"
                 
@@ -200,7 +201,7 @@ if uploaded_file is not None:
                         mime="application/pdf"
                     )
             else:
-                st.warning("⚠️ NENHUM PADRÃO DETECTADO. O ARQUIVO PODE SER UMA IMAGEM.")
+                st.warning("⚠️ NENHUM PADRÃO CONHECIDO DETECTADO. O ARQUIVO PODE SER UMA IMAGEM.")
                 
         except Exception as e:
             st.error(f"❌ ERRO CRÍTICO NO SISTEMA: {e}")
@@ -211,4 +212,3 @@ else:
         WAITING FOR INPUT STREAM...
     </div>
     """, unsafe_allow_html=True)
-
