@@ -2,6 +2,7 @@ import streamlit as st
 import fitz  # PyMuPDF
 import io
 import time
+import os
 
 # --- CONFIGURAÇÃO DA PÁGINA (Precisa ser a primeira linha) ---
 st.set_page_config(
@@ -82,7 +83,7 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("**CORE:** `ONLINE`")
     st.markdown("**MODULE:** `PYMUPDF`")
-    st.markdown("**VERSION:** `v1.0.4-beta`")
+    st.markdown("**VERSION:** `v1.0.5-stable`")
     st.markdown("---")
     st.info("💡 **DICA:** O algoritmo reescreve todas as alternativas para garantir anonimato total da resposta correta.")
     st.markdown("---")
@@ -93,7 +94,7 @@ st.markdown('<div class="title-glitch">> GabaritaAI_ </div>', unsafe_allow_html=
 st.markdown("`Inicializando protocolo de limpeza de provas...`")
 st.markdown("---")
 
-# --- FUNÇÕES DE LIMPEZA (Lógica Mantida) ---
+# --- FUNÇÕES DE LIMPEZA ---
 def desenhar_quadrado(page, rect_original, tamanho=9.0):
     page.add_redact_annot(rect_original, fill=(1, 1, 1))
     page.apply_redactions()
@@ -130,7 +131,6 @@ def processar_pdf(input_stream, status_terminal):
     barra = st.progress(0)
     
     for i, page in enumerate(doc):
-        # Efeito visual de processamento
         status_terminal.code(f"> SCANNING PAGE {i+1}/{total_paginas} ... [OK]")
         barra.progress((i + 1) / total_paginas)
         
@@ -167,12 +167,10 @@ if uploaded_file is not None:
     st.markdown("Arquivo detectado: `" + uploaded_file.name + "`")
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Botão com chamada para ação
     if st.button("🚀 EXECUTAR LIMPEZA DE DADOS"):
-        terminal = st.empty() # Placeholder para o log
+        terminal = st.empty()
         
         try:
-            # Simula um "boot" do sistema
             terminal.code("> INITIATING SYSTEM...")
             time.sleep(0.5)
             terminal.code("> LOADING MODULES...")
@@ -180,18 +178,23 @@ if uploaded_file is not None:
             
             pdf_limpo, qtd = processar_pdf(uploaded_file.read(), terminal)
             
-            terminal.empty() # Limpa o terminal
+            terminal.empty()
             
             if qtd > 0:
                 st.success(f"✔️ SUCESSO! {qtd} ALTERNATIVAS PADRONIZADAS.")
                 st.balloons()
+                
+                # --- LÓGICA DO NOME DO ARQUIVO ---
+                # Remove a extensão .pdf e adiciona _limpa.pdf
+                nome_original = os.path.splitext(uploaded_file.name)[0]
+                nome_novo = f"{nome_original}_limpa.pdf"
                 
                 col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
                     st.download_button(
                         label="📥 DOWNLOAD ARQUIVO LIMPO",
                         data=pdf_limpo,
-                        file_name="prova_hackeada_gabaritaai.pdf",
+                        file_name=nome_novo,
                         mime="application/pdf"
                     )
             else:
