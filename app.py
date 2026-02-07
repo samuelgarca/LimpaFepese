@@ -8,11 +8,9 @@ st.set_page_config(page_title="Limpador de Gabarito FEPESE", page_icon="📝")
 st.title("📝 Removedor de Gabarito - FEPESE")
 st.write("Faça upload da sua prova em PDF e baixe a versão limpa para treinar.")
 
-# Função de limpeza (A mesma lógica que criamos, adaptada para memória)
+# Função de limpeza 
 def limpar_pdf(input_stream):
-    # Abre o PDF a partir da memória (bytes)
-    doc = fitz.open(stream=input_stream, filetype="pdf")
-    
+    doc = fitz.open(stream=input_stream, filetype="pdf")    
     fontes_alvo = ["FontAwesome", "Dingbats", "Wingdings"] 
     codigos_alvo = [67, 83] # 67=Marcada, 83=Vazia
     TAMANHO = 9.0
@@ -20,7 +18,6 @@ def limpar_pdf(input_stream):
     
     progress_bar = st.progress(0)
     total_pages = len(doc)
-
     for i, page in enumerate(doc):
         # Atualiza barra de progresso
         progress_bar.progress((i + 1) / total_pages)
@@ -56,7 +53,7 @@ def limpar_pdf(input_stream):
                                     shape.commit()
                                     count += 1
     
-    # Salva o resultado em um buffer de memória (não no disco)
+    # Salva o resultado em um buffer de memória
     output_buffer = io.BytesIO()
     doc.save(output_buffer)
     output_buffer.seek(0)
@@ -88,3 +85,4 @@ if uploaded_file is not None:
                 )
             except Exception as e:
                 st.error(f"Ocorreu um erro: {e}")
+
