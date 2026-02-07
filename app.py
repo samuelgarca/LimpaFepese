@@ -4,27 +4,22 @@ import io
 import time
 import os
 
-# --- CONFIGURAÇÃO DA PÁGINA (Precisa ser a primeira linha) ---
-st.set_page_config(
-    page_title="GabaritaAI // System",
-    page_icon="💾",
-    layout="centered",
-    initial_sidebar_state="expanded"
-)
-
-# --- ESTILIZAÇÃO CSS (O visual Geek) ---
+# --- ESTILIZAÇÃO CSS
 st.markdown("""
 <style>
     /* Importando fonte estilo 'Console' */
     @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
 
     /* Fundo Geral e Texto */
+    /* Aplicamos a fonte no corpo principal, deixando os ícones (que usam outras classes) em paz */
     .stApp {
         background-color: #0e1117;
         font-family: 'Fira Code', monospace;
+        color: #e0e0e0;
     }
     
-    h1, h2, h3, p, div, span {
+    /* Forçamos a fonte apenas em Títulos e Parágrafos, não em ícones (spans/divs genéricos) */
+    h1, h2, h3, p {
         font-family: 'Fira Code', monospace !important;
         color: #e0e0e0;
     }
@@ -54,6 +49,7 @@ st.markdown("""
         border-radius: 0px;
         font-weight: bold;
         transition: all 0.3s ease;
+        font-family: 'Fira Code', monospace !important; /* Força fonte no botão */
     }
     
     .stButton>button:hover {
@@ -73,6 +69,12 @@ st.markdown("""
         background-color: rgba(0, 255, 65, 0.1);
         border-left: 5px solid #00ff41;
         color: #00ff41;
+    }
+    
+    /* Garante que os inputs de texto também fiquem geek */
+    .stTextInput > div > div > input {
+        font-family: 'Fira Code', monospace !important;
+        color: #00ff41 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -209,3 +211,4 @@ else:
         WAITING FOR INPUT STREAM...
     </div>
     """, unsafe_allow_html=True)
+
